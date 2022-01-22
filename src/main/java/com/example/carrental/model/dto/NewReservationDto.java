@@ -1,17 +1,18 @@
 package com.example.carrental.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ApplicationUserDto {
-    private Long id;
-    private String username;
-    private boolean admin;
+public class NewReservationDto {
+    private LocalDate reservationDate;
+    private LocalDate rentDateFrom;
+    private LocalDate rentDateTo;
 }

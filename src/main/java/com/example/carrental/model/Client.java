@@ -2,10 +2,7 @@ package com.example.carrental.model;
 
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -20,4 +17,9 @@ public class Client {
     private String surname;
     private String email;
     private String address;
+
+    @OneToOne(mappedBy = "client", cascade = {CascadeType.ALL},
+            fetch = FetchType.LAZY, optional = true)
+    private ApplicationUser user;
+
 }

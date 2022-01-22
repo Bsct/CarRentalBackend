@@ -21,6 +21,7 @@ public class ApplicationUser implements UserDetails {
     @Id
     @GeneratedValue
     private Long id;
+    @Column(unique = true)
     private String username;
     private String password;
 
@@ -28,7 +29,9 @@ public class ApplicationUser implements UserDetails {
     @ToString.Exclude
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<ApplicationUserRole> roles;
-
+    @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @JoinColumn(name = "client_id")
+    private Client client;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream().map(role ->
@@ -53,5 +56,17 @@ public class ApplicationUser implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public void setClient(Client client) {
+        if (client == null) {
+            if (this.client != null) {
+                this.client.setUser(null);
+            }
+        }
+        else {
+            client.setUser(this);
+        }
+        this.client = client;
     }
 }

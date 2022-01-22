@@ -11,6 +11,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import javax.transaction.Transactional;
 import java.util.*;
 
 @Slf4j
@@ -43,15 +44,16 @@ public class InitialDatabaseEntriesConfigurer implements ApplicationListener<Con
         addUserIfNotExists("employee", "employee", Arrays.asList(ROLE_EMPLOYEE));
     }
 
-    private void addUserIfNotExists(String username, String password, List<String> availableRoles) {
-        if(!applicationUserRepository.existsByUsername(username)){
+    @Transactional
+    public void addUserIfNotExists(String username, String password, List<String> availableRoles) {
+        if (!applicationUserRepository.existsByUsername(username)) {
 
             Set<ApplicationUserRole> roles = new HashSet<>();
             for (String role : availableRoles) {
                 Optional<ApplicationUserRole> optionalRole = applicationUserRoleRepository.findByName(role);
-                if (optionalRole.isPresent()){
+                if (optionalRole.isPresent()) {
                     roles.add(optionalRole.get());
-                }else{
+                } else {
                     log.error("Could not find role: " + role);
                 }
             }
@@ -61,18 +63,20 @@ public class InitialDatabaseEntriesConfigurer implements ApplicationListener<Con
                     .password(encoder.encode(password))
                     .roles(roles)
                     .build();
+//            user.setClient(new Client());
+
             applicationUserRepository.save(user);
         }
     }
 
     private void createRoles() {
-        for (String availableRole: AVAILABLE_ROLES) {
+        for (String availableRole : AVAILABLE_ROLES) {
             addIfNotExists(availableRole);
         }
     }
 
     private void addIfNotExists(String availableRole) {
-        if(!applicationUserRoleRepository.existsByName(availableRole)){
+        if (!applicationUserRoleRepository.existsByName(availableRole)) {
             ApplicationUserRole role = ApplicationUserRole.builder().name(availableRole).build();
             applicationUserRoleRepository.save(role);
         }

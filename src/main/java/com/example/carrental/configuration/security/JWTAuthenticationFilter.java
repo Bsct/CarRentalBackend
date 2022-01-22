@@ -6,6 +6,7 @@ import com.example.carrental.model.dto.AuthorizationDto;
 import com.example.carrental.service.ApplicationUserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,8 +23,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -67,7 +68,8 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
 //        this.appUserService.setLastSeen(System.currentTimeMillis(), username);
         StringBuilder stringBuilder = new StringBuilder();
-        for (ApplicationUserRole role : appUserService.loadRolesByUsername(username)) {
+        Set<String> applicationUserRoles = appUserService.loadRolesByUsername(username).stream().map(ApplicationUserRole::getName).collect(Collectors.toSet());
+        for (String role : applicationUserRoles) {
             stringBuilder.append(role).append(",");
         }
         String rolesString;
@@ -82,6 +84,8 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .setSubject(username)
                 .setExpiration(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME))
                 .setIssuer(RequestTranslator.getRemoteIpFrom(req))
+
+                .claim("roles",applicationUserRoles)
                 .signWith(SignatureAlgorithm.HS512, SecurityConstants.SECRET.getBytes())
                 .compact();
         res.addHeader(SecurityConstants.HEADER_STRING, SecurityConstants.TOKEN_PREFIX + token);

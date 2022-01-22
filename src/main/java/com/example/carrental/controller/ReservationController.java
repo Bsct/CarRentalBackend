@@ -1,6 +1,9 @@
 package com.example.carrental.controller;
 
+import com.example.carrental.model.RentPickup;
+import com.example.carrental.model.RentReturn;
 import com.example.carrental.model.Reservation;
+import com.example.carrental.model.dto.ReservationDto;
 import com.example.carrental.service.ApplicationUserService;
 import com.example.carrental.service.ReservationService;
 import lombok.RequiredArgsConstructor;
@@ -21,18 +24,27 @@ public class ReservationController {
 
 
     @PostMapping("/add/{carId}")
-    public void add(@RequestBody Reservation reservation, @PathVariable Long carId){
-        Reservation newReservation = reservationService.addCarToReservation(carId, reservation);
-        reservationService.add(newReservation);
+    public void saveNewReservation(@RequestBody Reservation reservation, @PathVariable Long carId) {
+        reservationService.addCarToReservation(carId, reservation);
     }
 
     @GetMapping("/{reservationId}")
-    public Reservation getReservationById(@PathVariable Long reservationId){
+    public Reservation getReservationById(@PathVariable Long reservationId) {
         return reservationService.getById(reservationId);
     }
 
+    @PostMapping("/{reservationId}/pickup")
+    public void addRentPickupToReservation(@RequestBody RentPickup rentPickup, @PathVariable Long reservationId) {
+        reservationService.addRentPickup(reservationId, rentPickup);
+    }
+
+    @PostMapping("/{reservationId}/return")
+    public void addRentReturnToReservation(@RequestBody RentReturn rentReturn, @PathVariable Long reservationId) {
+        reservationService.addRentReturn(reservationId, rentReturn);
+    }
+
     @GetMapping("")
-    public List<Reservation> getAll(Principal principal) {
+    public List<ReservationDto> getAll(Principal principal) {
         Optional<Long> usedIdOptional = applicationUserService.getLoggedInUserId(principal);
         log.info("Logged in?: " + usedIdOptional);
         return reservationService.findAllReservations();

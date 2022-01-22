@@ -21,15 +21,15 @@ public class Reservation {
     private LocalDate rentDateFrom;
     private LocalDate rentDateTo;
     private double price;
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinColumn(name = "car_id")
     private Car car;
-    @OneToOne
-    private Employee employeeReturn;
-    @OneToOne
-    private Employee employeePickup;
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "client_id")
     private Client client;
+    @OneToOne(cascade = CascadeType.PERSIST)
+    private RentPickup rentPickup;
     @OneToOne
-    private RentPickup rent;
+    private RentReturn rentReturn;
 
 }

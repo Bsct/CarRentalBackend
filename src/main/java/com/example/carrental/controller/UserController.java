@@ -19,9 +19,9 @@ public class UserController {
     private final ApplicationUserService applicationUserService;
 
     @GetMapping("")
-    public ApplicationUserDto get(Principal principal){
+    public ApplicationUserDto get(Principal principal) {
         Optional<Long> userIdOptional = applicationUserService.getLoggedInUserId(principal);
-        if(userIdOptional.isPresent()){
+        if (userIdOptional.isPresent()) {
             Long loggedInUserId = userIdOptional.get();
             return applicationUserService.getLoggedInUserDto(loggedInUserId);
         }
@@ -30,7 +30,7 @@ public class UserController {
 
     @CrossOrigin
     @PostMapping("/register")
-    public void get(@RequestBody RegisterApplicationUserDto dto){
+    public void get(@RequestBody RegisterApplicationUserDto dto) {
         applicationUserService.register(dto);
     }
 }
