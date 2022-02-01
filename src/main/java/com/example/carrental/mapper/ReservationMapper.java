@@ -5,7 +5,7 @@ import com.example.carrental.model.dto.ReservationDto;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 
-@Mapper(componentModel = "spring", uses = {CarMapper.class, ClientMapper.class, RentPickupMapper.class, RentReturnMapper.class}
+@Mapper(componentModel = "spring", uses = {CarMapper.class, RentPickupMapper.class, RentReturnMapper.class, UserMapper.class}
         , injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface ReservationMapper {
 

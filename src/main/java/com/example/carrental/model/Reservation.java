@@ -25,11 +25,11 @@ public class Reservation {
     @JoinColumn(name = "car_id")
     private Car car;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "client_id")
-    private Client client;
+    @JoinColumn(name = "user_id")
+    private ApplicationUser user;
     @OneToOne(cascade = CascadeType.PERSIST)
     private RentPickup rentPickup;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.PERSIST)
     private RentReturn rentReturn;
 
 }

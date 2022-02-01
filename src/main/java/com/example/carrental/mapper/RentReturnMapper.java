@@ -5,10 +5,10 @@ import com.example.carrental.model.dto.RentReturnDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {UserMapper.class})
 public interface RentReturnMapper {
 
-    @Mapping(target = "employeeSurname", source = "employee.surname")
-    @Mapping(target = "employeeName", source = "employee.name")
+    @Mapping(target = "employeeSurname", source = "user.surname")
+    @Mapping(target = "employeeName", source = "user.name")
     RentReturnDto map(RentReturn rentReturn);
 }

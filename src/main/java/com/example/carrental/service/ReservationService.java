@@ -1,16 +1,15 @@
 package com.example.carrental.service;
 
 import com.example.carrental.mapper.ReservationMapper;
-import com.example.carrental.model.Car;
-import com.example.carrental.model.RentPickup;
-import com.example.carrental.model.RentReturn;
-import com.example.carrental.model.Reservation;
+import com.example.carrental.model.*;
 import com.example.carrental.model.dto.ReservationDto;
+import com.example.carrental.repository.ApplicationUserRepository;
 import com.example.carrental.repository.CarRepository;
 import com.example.carrental.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -18,6 +17,7 @@ import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -27,6 +27,8 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final CarRepository carRepository;
     private final ReservationMapper reservationMapper;
+    private final ApplicationUserService userService;
+    private final ApplicationUserRepository userRepository;
 
     public List<ReservationDto> findAllReservations() {
         List<ReservationDto> reservationList = reservationRepository.findAll()
@@ -58,7 +60,12 @@ public class ReservationService {
     }
 
     private Reservation getReservation(Reservation reservation, Car car) {
+        String principal = (String) SecurityContextHolder.
+                getContext().getAuthentication().getPrincipal();
+        Optional<ApplicationUser> byUsername = userRepository.findByUsername(principal);
+        reservation.setUser(byUsername.get());
         reservation.setCar(car);
+
         long diff = ChronoUnit.DAYS.between(reservation.getRentDateFrom(), reservation.getRentDateTo());
         reservation.setPrice(car.getPrice() * diff);
         return reservation;
@@ -73,14 +80,27 @@ public class ReservationService {
             reservation.setRentPickup(rentPickup);
         }
         reservation.getCar().setRented(true);
+        String principal = (String) SecurityContextHolder.
+                getContext().getAuthentication().getPrincipal();
+        Optional<ApplicationUser> byUsername = userRepository.findByUsername(principal);
+        reservation.getRentPickup().setUser(byUsername.get());
         reservationRepository.save(reservation);
     }
 
+    @Transactional
     public void addRentReturn(Long reservationId, RentReturn rentReturn) {
         Reservation reservation = getById(reservationId);
-        reservation.setRentReturn(rentReturn);
+        if (reservation.getRentReturn() != null) {
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN, "Rent return already exists.");
+        } else {
+            reservation.setRentReturn(rentReturn);
+        }
         reservation.setPrice(reservation.getPrice() + rentReturn.getSurchargeFee());
         reservation.getCar().setRented(false);
+        String principal = (String) SecurityContextHolder.
+                getContext().getAuthentication().getPrincipal();
+        Optional<ApplicationUser> byUsername = userRepository.findByUsername(principal);
+        reservation.getRentReturn().setUser(byUsername.get());
         reservationRepository.save(reservation);
     }
 

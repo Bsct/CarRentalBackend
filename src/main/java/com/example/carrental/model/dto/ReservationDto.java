@@ -18,7 +18,7 @@ public class ReservationDto {
     private LocalDate rentDateTo;
     private double price;
     private CarDto car;
-    private ClientDto client;
+    private ApplicationUserDto user;
     private RentPickupDto rentPickup;
     private RentReturnDto rentReturn;
 }

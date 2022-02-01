@@ -12,5 +12,7 @@ import lombok.NoArgsConstructor;
 public class RegisterApplicationUserDto {
     private String username;
     private String password;
+    private String name;
+    private String surname;
     private boolean admin;
 }

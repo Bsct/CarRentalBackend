@@ -21,6 +21,6 @@ public class RentPickup {
     private LocalDate rentPickupDate;
     private String clientFeedback;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "employee_id")
-    private Employee employee;
+    @JoinColumn(name = "user_id")
+    private ApplicationUser user;
 }

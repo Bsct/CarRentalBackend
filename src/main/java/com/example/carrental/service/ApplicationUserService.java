@@ -2,7 +2,6 @@ package com.example.carrental.service;
 
 import com.example.carrental.model.ApplicationUser;
 import com.example.carrental.model.ApplicationUserRole;
-import com.example.carrental.model.Client;
 import com.example.carrental.model.dto.ApplicationUserDto;
 import com.example.carrental.model.dto.RegisterApplicationUserDto;
 import com.example.carrental.repository.ApplicationUserRepository;
@@ -89,6 +88,8 @@ public class ApplicationUserService implements UserDetailsService {
             return ApplicationUserDto.builder()
                     .id(applicationUser.getId())
                     .username(applicationUser.getUsername())
+                    .name(applicationUser.getName())
+                    .surname(applicationUser.getSurname())
                     .admin(applicationUser.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet()).contains("ROLE_ADMIN"))
                     .build();
         }
@@ -110,9 +111,10 @@ public class ApplicationUserService implements UserDetailsService {
         ApplicationUser user = ApplicationUser.builder()
                 .username(dto.getUsername())
                 .password(bCryptPasswordEncoder.encode(dto.getPassword()))
+                .name(dto.getName())
+                .surname(dto.getSurname())
                 .roles(roles)
                 .build();
-        user.setClient(new Client());
 
         try {
             applicationUserRepository.save(user);
