@@ -63,7 +63,6 @@ public class InitialDatabaseEntriesConfigurer implements ApplicationListener<Con
                     .password(encoder.encode(password))
                     .roles(roles)
                     .build();
-//            user.setClient(new Client());
 
             applicationUserRepository.save(user);
         }

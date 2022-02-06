@@ -1,38 +1,40 @@
 package com.example.carrental.service;
 
-import com.example.carrental.model.Car;
+import com.example.carrental.mapper.CarMapper;
+import com.example.carrental.model.dto.CarDto;
 import com.example.carrental.repository.CarRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class CarService {
     private final CarRepository carRepository;
+    private final CarMapper carMapper;
 
-    public List<Car> findAllCars(){
-        List<Car> carList = carRepository.findAll();
+    public List<CarDto> findAllCars() {
+        List<CarDto> carList = carRepository.findAll()
+                .stream().map(carMapper::mapCarToDto).collect(Collectors.toList());
         log.info("GetAll: " + carList);
         return carList;
     }
 
 
-    public Car findById(Long id) {
-        Optional<Car> car = carRepository.findById(id);
-        if (car.isPresent()){
-            return car.get();
-        }
-        throw new EntityNotFoundException("Not found: " + id);
+    public CarDto findCarDtoById(Long id) {
+        return carRepository.findById(id).map(carMapper::mapCarToDto)
+                .orElseThrow(() -> new EntityNotFoundException("Not found " + id));
     }
 
-    public void add(Car car){
-        log.info("Add: " + car);
-        carRepository.save(car);
+    @Transactional
+    public void add(CarDto carDto) {
+        log.info("Add: " + carDto);
+        carRepository.save(carMapper.mapDtoToCar(carDto));
     }
 }

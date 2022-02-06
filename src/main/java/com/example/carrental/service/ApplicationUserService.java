@@ -98,7 +98,12 @@ public class ApplicationUserService implements UserDetailsService {
 
     @Transactional
     public void register(RegisterApplicationUserDto dto) {
-        String roleName = dto.isAdmin() ? "ROLE_ADMIN" : "ROLE_USER";
+        String roleName;
+        if (dto.getType().equals("admin")) {
+            roleName = "ROLE_ADMIN";
+        } else if (dto.getType().equals("employee")) {
+            roleName = "ROLE_EMPLOYEE";
+        } else roleName = "ROLE_USER";
         Set<ApplicationUserRole> roles = new HashSet<>();
         Optional<ApplicationUserRole> optionalRole = applicationUserRoleRepository.findByName(roleName);
         if (optionalRole.isPresent()) {

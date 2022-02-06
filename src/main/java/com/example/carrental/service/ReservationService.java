@@ -1,7 +1,15 @@
 package com.example.carrental.service;
 
+import com.example.carrental.mapper.RentPickupMapper;
+import com.example.carrental.mapper.RentReturnMapper;
 import com.example.carrental.mapper.ReservationMapper;
-import com.example.carrental.model.*;
+import com.example.carrental.model.ApplicationUser;
+import com.example.carrental.model.Car;
+import com.example.carrental.model.RentReturn;
+import com.example.carrental.model.Reservation;
+import com.example.carrental.model.dto.NewReservationDto;
+import com.example.carrental.model.dto.RentPickupDto;
+import com.example.carrental.model.dto.RentReturnDto;
 import com.example.carrental.model.dto.ReservationDto;
 import com.example.carrental.repository.ApplicationUserRepository;
 import com.example.carrental.repository.CarRepository;
@@ -27,32 +35,26 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final CarRepository carRepository;
     private final ReservationMapper reservationMapper;
-    private final ApplicationUserService userService;
+    private final RentPickupMapper rentPickupMapper;
+    private final RentReturnMapper rentReturnMapper;
     private final ApplicationUserRepository userRepository;
 
     public List<ReservationDto> findAllReservations() {
         List<ReservationDto> reservationList = reservationRepository.findAll()
-                .stream().map(reservationMapper::map).collect(Collectors.toList());
+                .stream().map(reservationMapper::mapReservationToDto).collect(Collectors.toList());
         log.info("GetAll: " + reservationList);
         return reservationList;
     }
 
 
-    public Reservation getById(Long id) {
-        return reservationRepository.findById(id)
+    public ReservationDto getReservationDtoById(Long id) {
+        return reservationRepository.findById(id).map(reservationMapper::mapReservationToDto)
                 .orElseThrow(() -> new EntityNotFoundException("Not found " + id));
     }
 
-    public void add(Reservation reservation) {
-        reservationRepository.save(reservation);
-    }
-
-    public void delete(Reservation reservation) {
-        reservationRepository.delete(reservation);
-    }
-
     @Transactional
-    public void addCarToReservation(Long carId, Reservation reservation) {
+    public void addCarToReservation(Long carId, NewReservationDto newReservationDto) {
+        Reservation reservation = reservationMapper.mapFromNewReservation(newReservationDto);
         carRepository.findById(carId)
                 .map(car -> getReservation(reservation, car))
                 .ifPresent(reservationRepository::save);
@@ -72,12 +74,12 @@ public class ReservationService {
     }
 
     @Transactional
-    public void addRentPickup(Long reservationId, RentPickup rentPickup) {
-        Reservation reservation = getById(reservationId);
+    public void addRentPickup(Long reservationId, RentPickupDto rentPickupDto) {
+        Reservation reservation = reservationRepository.getById(reservationId);
         if (reservation.getRentPickup() != null) {
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN, "Rent pickup already exists.");
         } else {
-            reservation.setRentPickup(rentPickup);
+            reservation.setRentPickup(rentPickupMapper.mapDtoToRentPickup(rentPickupDto));
         }
         reservation.getCar().setRented(true);
         String principal = (String) SecurityContextHolder.
@@ -88,8 +90,9 @@ public class ReservationService {
     }
 
     @Transactional
-    public void addRentReturn(Long reservationId, RentReturn rentReturn) {
-        Reservation reservation = getById(reservationId);
+    public void addRentReturn(Long reservationId, RentReturnDto rentReturnDto) {
+        Reservation reservation = reservationRepository.getById(reservationId);
+        RentReturn rentReturn = rentReturnMapper.mapDtoToRentReturn(rentReturnDto);
         if (reservation.getRentReturn() != null) {
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN, "Rent return already exists.");
         } else {

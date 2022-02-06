@@ -20,7 +20,7 @@ public class RentPickup {
     private Long id;
     private LocalDate rentPickupDate;
     private String clientFeedback;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "user_id")
     private ApplicationUser user;
 }

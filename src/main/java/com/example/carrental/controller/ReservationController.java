@@ -1,8 +1,8 @@
 package com.example.carrental.controller;
 
-import com.example.carrental.model.RentPickup;
-import com.example.carrental.model.RentReturn;
-import com.example.carrental.model.Reservation;
+import com.example.carrental.model.dto.NewReservationDto;
+import com.example.carrental.model.dto.RentPickupDto;
+import com.example.carrental.model.dto.RentReturnDto;
 import com.example.carrental.model.dto.ReservationDto;
 import com.example.carrental.service.ApplicationUserService;
 import com.example.carrental.service.ReservationService;
@@ -21,26 +21,25 @@ import java.util.Optional;
 public class ReservationController {
     private final ReservationService reservationService;
     private final ApplicationUserService applicationUserService;
-
-
+    
     @PostMapping("/add/{carId}")
-    public void saveNewReservation(@RequestBody Reservation reservation, @PathVariable Long carId) {
-        reservationService.addCarToReservation(carId, reservation);
+    public void saveNewReservation(@RequestBody NewReservationDto newReservationDto, @PathVariable Long carId) {
+        reservationService.addCarToReservation(carId, newReservationDto);
     }
 
     @GetMapping("/{reservationId}")
-    public Reservation getReservationById(@PathVariable Long reservationId) {
-        return reservationService.getById(reservationId);
+    public ReservationDto getReservationById(@PathVariable Long reservationId) {
+        return reservationService.getReservationDtoById(reservationId);
     }
 
     @PostMapping("/{reservationId}/pickup")
-    public void addRentPickupToReservation(@RequestBody RentPickup rentPickup, @PathVariable Long reservationId) {
-        reservationService.addRentPickup(reservationId, rentPickup);
+    public void addRentPickupToReservation(@RequestBody RentPickupDto rentPickupDto, @PathVariable Long reservationId) {
+        reservationService.addRentPickup(reservationId, rentPickupDto);
     }
 
     @PostMapping("/{reservationId}/return")
-    public void addRentReturnToReservation(@RequestBody RentReturn rentReturn, @PathVariable Long reservationId) {
-        reservationService.addRentReturn(reservationId, rentReturn);
+    public void addRentReturnToReservation(@RequestBody RentReturnDto rentReturnDto, @PathVariable Long reservationId) {
+        reservationService.addRentReturn(reservationId, rentReturnDto);
     }
 
     @GetMapping("")

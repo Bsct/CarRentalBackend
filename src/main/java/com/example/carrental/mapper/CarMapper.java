@@ -9,5 +9,8 @@ import org.mapstruct.Mapping;
 public interface CarMapper {
 
     @Mapping(target = "year", source = "productionYear")
-    CarDto mapCar(Car car);
+    CarDto mapCarToDto(Car car);
+
+    @Mapping(target = "productionYear", source = "year")
+    Car mapDtoToCar(CarDto carDto);
 }

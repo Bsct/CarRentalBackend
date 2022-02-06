@@ -1,6 +1,7 @@
 package com.example.carrental.mapper;
 
 import com.example.carrental.model.Reservation;
+import com.example.carrental.model.dto.NewReservationDto;
 import com.example.carrental.model.dto.ReservationDto;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
@@ -9,5 +10,7 @@ import org.mapstruct.Mapper;
         , injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface ReservationMapper {
 
-    ReservationDto map(Reservation reservation);
+    ReservationDto mapReservationToDto(Reservation reservation);
+
+    Reservation mapFromNewReservation(NewReservationDto reservationDto);
 }

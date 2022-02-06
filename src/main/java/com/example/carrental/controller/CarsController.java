@@ -1,6 +1,6 @@
 package com.example.carrental.controller;
 
-import com.example.carrental.model.Car;
+import com.example.carrental.model.dto.CarDto;
 import com.example.carrental.service.CarService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -16,19 +16,19 @@ public class CarsController {
 
     @CrossOrigin
     @GetMapping("")
-    public List<Car> get() {
+    public List<CarDto> get() {
         return carService.findAllCars();
     }
 
     @CrossOrigin
     @PostMapping("")
-    public void add(@RequestBody Car car) {
-        carService.add(car);
+    public void add(@RequestBody CarDto carDto) {
+        carService.add(carDto);
     }
 
     @CrossOrigin
     @GetMapping("/{id}")
-    public Car getById(@PathVariable Long id){
-        return carService.findById(id);
+    public CarDto getById(@PathVariable Long id) {
+        return carService.findCarDtoById(id);
     }
 }

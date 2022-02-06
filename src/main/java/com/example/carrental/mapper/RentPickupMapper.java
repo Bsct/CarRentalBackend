@@ -11,4 +11,8 @@ public interface RentPickupMapper {
     @Mapping(target = "employeeSurname", source = "user.surname")
     @Mapping(target = "employeeName", source = "user.name")
     RentPickupDto map(RentPickup rentPickup);
+
+    @Mapping(target = "user.surname", source = "employeeSurname")
+    @Mapping(target = "user.name", source = "employeeName")
+    RentPickup mapDtoToRentPickup(RentPickupDto rentPickupDto);
 }

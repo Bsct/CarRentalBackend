@@ -21,7 +21,7 @@ public class RentReturn {
     private LocalDate rentReturnDate;
     private double surchargeFee;
     private String clientFeedback;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "user_id")
     private ApplicationUser user;
 }
